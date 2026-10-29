@@ -1,6 +1,6 @@
 // lib/db/index.ts
 import { v4 as uuidv4 } from 'uuid';
-import { db, type Unit, type TimetableEntry, type Assignment, type Note } from './schema';
+import { db, type Unit, type TimetableEntry, type Assignment, type Note, type GpaEntry } from './schema';
 
 // ---- UNITS ----
 export async function createUnit(input: {
@@ -64,6 +64,23 @@ export async function getAssignmentsForUser(userId: string) {
     .sortBy('dueDate');
 }
 
+// NEW: Toggle Assignment Complete
+export async function toggleAssignmentComplete(id: string) {
+  const existing = await db.assignments.get(id);
+  if (!existing) return;
+  await db.assignments.put({
+    ...existing,
+    completed: !existing.completed,
+    updatedAt: new Date().toISOString(),
+    syncStatus: 'pending',
+  });
+}
+
+// NEW: Delete Assignment
+export async function deleteAssignment(id: string) {
+  await db.assignments.delete(id);
+}
+
 // ---- NOTES ----
 export async function upsertNote(input: Omit<Note, 'id' | 'updatedAt' | 'syncStatus'>) {
   const existing = await db.notes.where('unitId').equals(input.unitId).first();
@@ -91,13 +108,62 @@ export async function getNoteForUnit(unitId: string) {
   return db.notes.where('unitId').equals(unitId).first();
 }
 
+// ---- GPA ENTRIES ----
+export async function upsertGpaEntry(input: {
+  userId: string;
+  unitId: string;
+  percentage: number;
+  credits: number;
+  semester: string;
+}) {
+  const existing = await db.gpaEntries
+    .where('unitId')
+    .equals(input.unitId)
+    .and((e) => e.semester === input.semester)
+    .first();
+
+  if (existing) {
+    const updated: GpaEntry = {
+      ...existing,
+      percentage: input.percentage,
+      credits: input.credits,
+      updatedAt: new Date().toISOString(),
+      syncStatus: 'pending',
+    };
+    await db.gpaEntries.put(updated);
+    return updated;
+  }
+
+  const entry: GpaEntry = {
+    id: uuidv4(),
+    ...input,
+    updatedAt: new Date().toISOString(),
+    syncStatus: 'pending',
+  };
+  await db.gpaEntries.add(entry);
+  return entry;
+}
+
+export async function getGpaEntriesForSemester(userId: string, semester: string) {
+  return db.gpaEntries
+    .where('userId')
+    .equals(userId)
+    .and((e) => e.semester === semester)
+    .toArray();
+}
+
+export async function deleteGpaEntry(id: string) {
+  await db.gpaEntries.delete(id);
+}
+
 // ---- SYNC QUEUE ----
 export async function getPendingRecords() {
-  const [units, timetable, assignments, notes] = await Promise.all([
+  const [units, timetable, assignments, notes, gpaEntries] = await Promise.all([
     db.units.where('syncStatus').equals('pending').toArray(),
     db.timetable.where('syncStatus').equals('pending').toArray(),
     db.assignments.where('syncStatus').equals('pending').toArray(),
     db.notes.where('syncStatus').equals('pending').toArray(),
+    db.gpaEntries.where('syncStatus').equals('pending').toArray(), // Added GPA to sync queue
   ]);
-  return { units, timetable, assignments, notes };
+  return { units, timetable, assignments, notes, gpaEntries };
 }
