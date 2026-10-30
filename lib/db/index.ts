@@ -207,3 +207,36 @@ export async function updateSettings(
     updatedAt: new Date().toISOString(),
   });
 }
+
+// ---- NOTES (Aggregated) ----
+export async function getNotesForUser(userId: string) {
+  return db.notes.where('userId').equals(userId).toArray();
+}
+
+// ---- NEW UNIT MANAGEMENT FUNCTIONS ----
+export async function updateUnit(
+  id: string,
+  patch: Partial<Pick<Unit, "name" | "code" | "credits">>
+) {
+  const existing = await db.units.get(id);
+  if (!existing) return;
+  await db.units.put({
+    ...existing,
+    ...patch,
+    updatedAt: new Date().toISOString(),
+    syncStatus: "pending",
+  });
+}
+
+export async function deleteUnit(id: string) {
+  await db.transaction(
+    "rw",
+    [db.units, db.timetable, db.assignments, db.notes], // <-- Removed db.gpaEntries
+    async () => {
+      await db.timetable.where("unitId").equals(id).delete();
+      await db.assignments.where("unitId").equals(id).delete();
+      await db.notes.where("unitId").equals(id).delete();
+      await db.units.delete(id);
+    }
+  );
+}
