@@ -64,13 +64,22 @@ export interface SyncMeta {
   lastSyncedAt: string;
 }
 
+// NEW: AppSettings interface
+export interface AppSettings {
+  userId: string;            // primary key
+  remindersEnabled: boolean;
+  reminderLeadMinutes: number;  // 5, 10, 15, 30
+  updatedAt: string;
+}
+
 export class CampusDB extends Dexie {
   units!: Table<Unit, string>;
   timetable!: Table<TimetableEntry, string>;
   assignments!: Table<Assignment, string>;
   notes!: Table<Note, string>;
   gpaEntries!: Table<GpaEntry, string>;   
-  syncMeta!: Table<SyncMeta, string>;   // <-- UPDATED TO USE THE NEW INTERFACE
+  syncMeta!: Table<SyncMeta, string>;   
+  settings!: Table<AppSettings, string>;   // <-- ADDED THIS LINE
 
   constructor() {
     super('CampusCompanionDB');
@@ -82,14 +91,18 @@ export class CampusDB extends Dexie {
       notes: 'id, userId, unitId, syncStatus',
     });
 
-    // NEW version block — Dexie migrates automatically without deleting data
+    // Existing version block from your file
     this.version(2).stores({
       gpaEntries: 'id, userId, unitId, semester, syncStatus',
     });
 
-    // UPDATED VERSION 3
     this.version(3).stores({
       syncMeta: 'table',
+    });
+
+    // ADDED THIS NEW VERSION BLOCK
+    this.version(4).stores({
+      settings: 'userId',
     });
   }
 }

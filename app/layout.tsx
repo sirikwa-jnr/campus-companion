@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SerwistProvider } from "@/components/serwist-provider";
 import { SyncIndicator } from "@/components/sync-indicator";
+import { AppShell } from "@/components/app-shell";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -50,13 +51,14 @@ export default function RootLayout({
                     <Link href="/timetable" className="hover:text-foreground">Timetable</Link>
                     <Link href="/assignments" className="hover:text-foreground">Assignments</Link>
                     <Link href="/gpa" className="hover:text-foreground">GPA</Link>
+                    <Link href="/settings" className="hover:text-foreground">Settings</Link>
                   </div>
                   <SyncIndicator />
                   <ThemeToggle />
                 </div>
               </nav>
               <main className="max-w-5xl mx-auto px-4 py-6">
-                {children}
+                <AppShell>{children}</AppShell>
               </main>
             </div>
           </ThemeProvider>

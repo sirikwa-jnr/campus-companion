@@ -1,6 +1,7 @@
 // lib/db/index.ts
 import { v4 as uuidv4 } from 'uuid';
 import { db, type Unit, type TimetableEntry, type Assignment, type Note, type GpaEntry } from './schema';
+import type { AppSettings } from './schema';
 
 // ---- UNITS ----
 export async function createUnit(input: {
@@ -166,4 +167,43 @@ export async function getPendingRecords() {
     db.gpaEntries.where('syncStatus').equals('pending').toArray(), // Added GPA to sync queue
   ]);
   return { units, timetable, assignments, notes, gpaEntries };
+}
+
+// ---- SETTINGS ----
+const DEFAULT_SETTINGS: Omit<AppSettings, 'userId' | 'updatedAt'> = {
+  remindersEnabled: true,
+  reminderLeadMinutes: 10,
+};
+
+// 1. READ-ONLY function (safe for useLiveQuery)
+export async function getSettings(userId: string): Promise<AppSettings | undefined> {
+  return db.settings.get(userId);
+}
+
+// 2. INITIALIZATION function (call this once on mount)
+export async function initSettings(userId: string): Promise<AppSettings> {
+  const existing = await db.settings.get(userId);
+  if (existing) return existing;
+
+  const fresh: AppSettings = {
+    userId,
+    ...DEFAULT_SETTINGS,
+    updatedAt: new Date().toISOString(),
+  };
+  await db.settings.put(fresh);
+  return fresh;
+}
+
+export async function updateSettings(
+  userId: string,
+  patch: Partial<Omit<AppSettings, 'userId'>>
+) {
+  const current = await getSettings(userId);
+  if (!current) return; // Safety check
+
+  await db.settings.put({
+    ...current,
+    ...patch,
+    updatedAt: new Date().toISOString(),
+  });
 }
