@@ -58,12 +58,19 @@ export interface GpaEntry {
   syncStatus: 'synced' | 'pending';
 }
 
+// NEW: SyncMeta interface
+export interface SyncMeta {
+  table: string;
+  lastSyncedAt: string;
+}
+
 export class CampusDB extends Dexie {
   units!: Table<Unit, string>;
   timetable!: Table<TimetableEntry, string>;
   assignments!: Table<Assignment, string>;
   notes!: Table<Note, string>;
-  gpaEntries!: Table<GpaEntry, string>;   // NEW
+  gpaEntries!: Table<GpaEntry, string>;   
+  syncMeta!: Table<SyncMeta, string>;   // <-- UPDATED TO USE THE NEW INTERFACE
 
   constructor() {
     super('CampusCompanionDB');
@@ -78,6 +85,11 @@ export class CampusDB extends Dexie {
     // NEW version block — Dexie migrates automatically without deleting data
     this.version(2).stores({
       gpaEntries: 'id, userId, unitId, semester, syncStatus',
+    });
+
+    // UPDATED VERSION 3
+    this.version(3).stores({
+      syncMeta: 'table',
     });
   }
 }

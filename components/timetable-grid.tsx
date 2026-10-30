@@ -2,20 +2,22 @@
 
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db/schema";
-import { TEMP_USER_ID } from "@/lib/constants";
+import { useUser } from "@/hooks/use-user";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export function TimetableGrid() {
+  const { user } = useUser();
+
   // useLiveQuery automatically updates the screen if the database changes!
   const entries = useLiveQuery(
-    () => db.timetable.where("userId").equals(TEMP_USER_ID).toArray(),
-    []
+    () => db.timetable.where("userId").equals(user?.id || "").toArray(),
+    [user?.id]
   );
 
   const units = useLiveQuery(
-    () => db.units.where("userId").equals(TEMP_USER_ID).toArray(),
-    []
+    () => db.units.where("userId").equals(user?.id || "").toArray(),
+    [user?.id]
   );
 
   // Map unit IDs to their actual data (so we can show "CSC 201" instead of a random ID)

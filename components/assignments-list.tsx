@@ -8,35 +8,36 @@ import {
   toggleAssignmentComplete,
   deleteAssignment,
 } from "@/lib/db";
-import { TEMP_USER_ID } from "@/lib/constants";
+import { useUser } from "@/hooks/use-user";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 
 export function AssignmentsList() {
+  const { user } = useUser();
   const [unitId, setUnitId] = useState("");
   const [title, setTitle] = useState("");
   const [dueDate, setDueDate] = useState("");
 
   const assignments = useLiveQuery(
-    () => db.assignments.where("userId").equals(TEMP_USER_ID).sortBy("dueDate"),
-    []
+    () => db.assignments.where("userId").equals(user?.id || "").sortBy("dueDate"),
+    [user?.id]
   );
 
   const units = useLiveQuery(
-    () => db.units.where("userId").equals(TEMP_USER_ID).toArray(),
-    []
+    () => db.units.where("userId").equals(user?.id || "").toArray(),
+    [user?.id]
   );
 
   const unitMap = new Map(units?.map((u) => [u.id, u]) ?? []);
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
-    if (!unitId || !title || !dueDate) return;
+    if (!user || !title || !dueDate) return;
 
     await createAssignment({
-      userId: TEMP_USER_ID,
+      userId: user.id,
       unitId,
       title,
       description: "",

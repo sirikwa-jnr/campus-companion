@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SerwistProvider } from "@/components/serwist-provider";
+import { SyncIndicator } from "@/components/sync-indicator";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -50,6 +51,7 @@ export default function RootLayout({
                     <Link href="/assignments" className="hover:text-foreground">Assignments</Link>
                     <Link href="/gpa" className="hover:text-foreground">GPA</Link>
                   </div>
+                  <SyncIndicator />
                   <ThemeToggle />
                 </div>
               </nav>

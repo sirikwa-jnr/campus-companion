@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db/schema";
 import { createTimetableEntry, createUnit } from "@/lib/db";
-import { TEMP_USER_ID } from "@/lib/constants";
+import { useUser } from "@/hooks/use-user";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +27,7 @@ const DAYS = [
 ];
 
 export function AddClassDialog() {
+  const { user } = useUser();
   const [open, setOpen] = useState(false);
   const [unitId, setUnitId] = useState("");
   const [newUnitName, setNewUnitName] = useState("");
@@ -38,19 +39,20 @@ export function AddClassDialog() {
 
   // Live list of units so the dropdown updates automatically
   const units = useLiveQuery(
-    () => db.units.where("userId").equals(TEMP_USER_ID).toArray(),
-    []
+    () => db.units.where("userId").equals(user?.id || "").toArray(),
+    [user?.id]
   );
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!user) return;
 
     let finalUnitId = unitId;
 
     // If no unit selected, create a new one first
     if (!finalUnitId && newUnitCode) {
       const newUnit = await createUnit({
-        userId: TEMP_USER_ID,
+        userId: user.id,
         name: newUnitName || newUnitCode,
         code: newUnitCode,
         credits: 3,
@@ -62,7 +64,7 @@ export function AddClassDialog() {
 
     // Save the timetable entry
     await createTimetableEntry({
-      userId: TEMP_USER_ID,
+      userId: user.id,
       unitId: finalUnitId,
       dayOfWeek,
       startTime,
