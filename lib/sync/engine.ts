@@ -91,10 +91,9 @@ export async function syncPendingData(userId: string) {
   }
 
   // 5. Sync GPA Entries
-  const pendingGpa = await db.gpaEntries.where("syncStatus").equals("pending").toArray();
-  if (pendingGpa.length > 0) {
-    const { error } = await supabase.from("gpa_entries").upsert(
-      pendingGpa.map((g) => ({
+  if (pending.gpaEntries.length > 0) {
+    const { error } = await supabase.from("gpaEntries").upsert(
+      pending.gpaEntries.map((g) => ({
         id: g.id,
         user_id: userId,
         unit_id: g.unitId,
@@ -106,7 +105,7 @@ export async function syncPendingData(userId: string) {
     );
     if (!error) {
       await db.gpaEntries.bulkUpdate(
-        pendingGpa.map((g) => ({ key: g.id, changes: { syncStatus: "synced" } }))
+        pending.gpaEntries.map((g) => ({ key: g.id, changes: { syncStatus: "synced" } }))
       );
     }
   }
