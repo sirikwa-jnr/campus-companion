@@ -50,7 +50,8 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
+  /* UPDATED: Soft Warm Stone background (30 20% 97%) */
+  --background: oklch(0.97 0.005 85); 
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -85,7 +86,8 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  /* UPDATED: Soft Dark Slate background (222.2 47.4% 11.2%) */
+  --background: oklch(0.23 0.03 250);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);

@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { getSettings, initSettings, updateSettings } from "@/lib/db";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { isStoragePersistent } from "@/lib/storage/persist";
 
 export function ReminderSettings({ userId }: { userId: string }) {
   // 1. Initialize settings safely in the background
@@ -14,6 +15,11 @@ export function ReminderSettings({ userId }: { userId: string }) {
 
   // 2. Read settings (now safe and read-only)
   const settings = useLiveQuery(() => getSettings(userId), [userId]);
+
+  const [persistent, setPersistent] = useState<boolean | null>(null);
+  useEffect(() => {
+    isStoragePersistent().then(setPersistent);
+  }, []);
 
   if (!settings) return null; // Loading state
 
@@ -55,6 +61,15 @@ export function ReminderSettings({ userId }: { userId: string }) {
           <option value={15}>15 minutes before</option>
           <option value={30}>30 minutes before</option>
         </select>
+      </div>
+
+      <div className="pt-3 border-t text-xs text-muted-foreground">
+        Storage:{" "}
+        {persistent === null
+          ? "Checking…"
+          : persistent
+          ? "Persistent ✓"
+          : "Best-effort (install the app for better protection)"}
       </div>
     </Card>
   );
