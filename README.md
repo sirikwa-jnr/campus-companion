@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Campus Companion
 
-## Getting Started
+**Offline-first timetable, assignments, GPA, and notes for university students.**
 
-First, run the development server:
+Built by [Rodney Achota](https://github.com/sirikwa-jnr)
+
+[Live App](https://campus-companion-sigma.vercel.app) · [Report a Bug](https://github.com/sirikwa-jnr/campus-companion/issues) · [Request a Feature](https://github.com/sirikwa-jnr/campus-companion/issues)
+
+---
+
+## What is this?
+
+Campus Companion is a Progressive Web App (PWA) that helps university students organize their semester:
+
+- **Timetable** — weekly view of classes with room and time
+- **Assignments** — deadline tracking with overdue detection
+- **GPA** — KAFU percentage-weighted average calculator
+- **Notes** — per-unit notes that autosave as you type
+- **Reminders** — in-app banner before class starts
+
+**Key differentiator:** it works **fully offline**. All data lives in the browser (IndexedDB) and syncs to the cloud when online. Students can add a class on the bus with no signal and see it on their laptop when they get home.
+
+---
+
+## Stack
+
+| Layer | Tech |
+| --- | --- |
+| Framework | Next.js 15 (App Router, Turbopack) |
+| Styling | Tailwind CSS + shadcn/ui |
+| Local storage | Dexie.js (IndexedDB wrapper) |
+| Backend | Supabase (Postgres + Auth + RLS) |
+| PWA | Serwist (service worker, precaching) |
+| Deploy | Vercel |
+
+---
+
+## Local Development
+
+### Prerequisites
+
+- Node.js 20+ (`node -v`)
+- A Supabase account ([supabase.com](https://supabase.com))
+
+### Steps
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+git clone https://github.com/sirikwa-jnr/campus-companion.git
+cd campus-companion
+npm install
