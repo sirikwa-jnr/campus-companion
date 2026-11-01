@@ -30,7 +30,8 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const publicPaths = ["/login", "/signup", "/auth"];
+  // UPDATED: Added forgot-password and update-password to public paths
+  const publicPaths = ["/login", "/signup", "/auth", "/forgot-password", "/update-password"];
   const isPublic = publicPaths.some((p) =>
     request.nextUrl.pathname.startsWith(p)
   );

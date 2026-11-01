@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db/schema";
 import { useUser } from "@/hooks/use-user";
-import { updateUnit, deleteUnit } from "@/lib/db";
+import { updateUnit, deleteUnitCompletely } from "@/lib/db";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,7 +34,7 @@ export default function UnitsPage() {
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this unit? Related timetable, assignments, notes and GPA entries will also be removed.")) return;
-    await deleteUnit(id);
+    await deleteUnitCompletely(id);
   }
 
   return (

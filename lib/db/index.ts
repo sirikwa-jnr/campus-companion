@@ -240,3 +240,17 @@ export async function deleteUnit(id: string) {
     }
   );
 }
+
+// ADD THIS FUNCTION
+export async function deleteUnitCompletely(unitId: string) {
+  await db.transaction("rw", db.units, db.timetable, db.assignments, db.notes, db.gpaEntries, async () => {
+    // 1. Delete all linked records
+    await db.timetable.where("unitId").equals(unitId).delete();
+    await db.assignments.where("unitId").equals(unitId).delete();
+    await db.notes.where("unitId").equals(unitId).delete();
+    await db.gpaEntries.where("unitId").equals(unitId).delete();
+    
+    // 2. Delete the unit itself
+    await db.units.delete(unitId);
+  });
+}
