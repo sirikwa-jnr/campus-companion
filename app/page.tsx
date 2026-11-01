@@ -13,7 +13,7 @@ const tools = [
 ];
 
 export default function HomePage() {
-  const { user, loading } = useUser();
+  const { user } = useUser();
 
   return (
     <div className="space-y-6">
