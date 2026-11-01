@@ -8,13 +8,22 @@ import { AppShell } from "@/components/app-shell";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { InstallPrompt } from "@/components/install-prompt";
 import { Navbar } from "@/components/navbar";
-import { Analytics } from "@vercel/analytics/next"; // <-- NEW IMPORT
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Campus Companion",
   description: "Timetable, assignments, GPA and notes for university students",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Campus Companion",
+  },
+  icons: {
+    icon: "/icons/icon-192.png",
+    apple: "/icons/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
