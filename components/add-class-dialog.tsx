@@ -91,8 +91,9 @@ export function AddClassDialog() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label>Unit</Label>
+            {/* UPDATED: Fixed background and text color */}
             <select
-              className="w-full border rounded-md px-3 py-2 text-sm mt-1 bg-transparent"
+              className="w-full border rounded-md px-3 py-2 text-sm mt-1 bg-background text-foreground"
               value={unitId}
               onChange={(e) => setUnitId(e.target.value)}
             >
@@ -130,8 +131,9 @@ export function AddClassDialog() {
           <div className="grid grid-cols-3 gap-3">
             <div>
               <Label>Day</Label>
+              {/* UPDATED: Fixed background and text color */}
               <select
-                className="w-full border rounded-md px-3 py-2 text-sm mt-1 bg-transparent"
+                className="w-full border rounded-md px-3 py-2 text-sm mt-1 bg-background text-foreground"
                 value={dayOfWeek}
                 onChange={(e) => setDayOfWeek(Number(e.target.value))}
               >

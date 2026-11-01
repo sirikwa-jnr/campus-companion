@@ -5,7 +5,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db/schema";
 import { createUnit, upsertGpaEntry, deleteGpaEntry } from "@/lib/db";
 import { calculateWeightedAverage, percentageToLetter } from "@/lib/gpa";
-import { TEMP_USER_ID } from "@/lib/constants";
+import { useUser } from "@/hooks/use-user";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +14,7 @@ import { Card } from "@/components/ui/card";
 const SEMESTER = "2025-S1"; // hardcoded for v1; add a selector later
 
 export function GpaCalculator() {
+  const { user } = useUser();
   const [unitCode, setUnitCode] = useState("");
   const [unitName, setUnitName] = useState("");
   const [credits, setCredits] = useState(3);
@@ -23,15 +24,15 @@ export function GpaCalculator() {
     () =>
       db.gpaEntries
         .where("userId")
-        .equals(TEMP_USER_ID)
+        .equals(user?.id || "")
         .and((e) => e.semester === SEMESTER)
         .toArray(),
-    []
+    [user?.id]
   );
 
   const units = useLiveQuery(
-    () => db.units.where("userId").equals(TEMP_USER_ID).toArray(),
-    []
+    () => db.units.where("userId").equals(user?.id || "").toArray(),
+    [user?.id]
   );
 
   const unitMap = new Map(units?.map((u) => [u.id, u]) ?? []);
@@ -47,19 +48,21 @@ export function GpaCalculator() {
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
+    if (!user) return;
+    
     const pct = parseFloat(percentage);
     if (!unitCode || isNaN(pct) || pct < 0 || pct > 100) return;
 
     // Create unit if it doesn't exist, then create gpa entry
     const newUnit = await createUnit({
-      userId: TEMP_USER_ID,
+      userId: user.id,
       name: unitName || unitCode,
       code: unitCode,
       credits,
     });
 
     await upsertGpaEntry({
-      userId: TEMP_USER_ID,
+      userId: user.id,
       unitId: newUnit.id,
       percentage: pct,
       credits,

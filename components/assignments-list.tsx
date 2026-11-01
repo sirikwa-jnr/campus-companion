@@ -66,8 +66,9 @@ export function AssignmentsList() {
         <form onSubmit={handleAdd} className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div>
             <Label className="text-xs">Unit</Label>
+            {/* UPDATED: Changed bg-transparent to bg-background text-foreground */}
             <select
-              className="w-full border rounded px-3 py-2 text-sm bg-transparent"
+              className="w-full border rounded px-3 py-2 text-sm bg-background text-foreground"
               value={unitId}
               onChange={(e) => setUnitId(e.target.value)}
               required
