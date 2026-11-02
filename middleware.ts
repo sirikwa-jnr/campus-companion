@@ -30,18 +30,22 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Added forgot-password and update-password to public paths
-  const publicPaths = ["/login", "/signup", "/auth", "/forgot-password", "/update-password"];
+  // UPDATED: Added "/" to public paths so Google can crawl the homepage.
+  // Also included all other public routes.
+  const publicPaths = ["/", "/login", "/signup", "/auth", "/forgot-password", "/update-password"];
+  
   const isPublic = publicPaths.some((p) =>
-    request.nextUrl.pathname.startsWith(p)
+    request.nextUrl.pathname === p || request.nextUrl.pathname.startsWith(`${p}/`)
   );
 
+  // If there is no user, and the path is NOT public, redirect to login
   if (!user && !isPublic) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
+  // If there is a user, and they try to access /login, redirect to dashboard
   if (user && request.nextUrl.pathname === "/login") {
     const url = request.nextUrl.clone();
     url.pathname = "/";
