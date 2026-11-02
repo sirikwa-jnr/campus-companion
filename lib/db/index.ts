@@ -10,6 +10,17 @@ export async function createUnit(input: {
   code: string;
   credits: number;
 }) {
+  // Check if a unit with this code already exists for this user
+  const existing = await db.units
+    .where("userId")
+    .equals(input.userId)
+    .and((u) => u.code.toLowerCase().trim() === input.code.toLowerCase().trim())
+    .first();
+
+  if (existing) {
+    throw new Error(`A unit with the code "${input.code}" already exists.`);
+  }
+
   const now = new Date().toISOString();
   const unit: Unit = {
     id: uuidv4(),
@@ -231,7 +242,7 @@ export async function updateUnit(
 export async function deleteUnit(id: string) {
   await db.transaction(
     "rw",
-    [db.units, db.timetable, db.assignments, db.notes], // <-- Removed db.gpaEntries
+    [db.units, db.timetable, db.assignments, db.notes], 
     async () => {
       await db.timetable.where("unitId").equals(id).delete();
       await db.assignments.where("unitId").equals(id).delete();

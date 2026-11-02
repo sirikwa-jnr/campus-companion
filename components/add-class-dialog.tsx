@@ -36,6 +36,7 @@ export function AddClassDialog() {
   const [startTime, setStartTime] = useState("08:00");
   const [endTime, setEndTime] = useState("10:00");
   const [room, setRoom] = useState("");
+  const [error, setError] = useState("");
 
   // Live list of units so the dropdown updates automatically
   const units = useLiveQuery(
@@ -46,39 +47,50 @@ export function AddClassDialog() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!user) return;
+    
+    setError(""); // Clear previous errors
 
     let finalUnitId = unitId;
 
-    // If no unit selected, create a new one first
-    if (!finalUnitId && newUnitCode) {
-      const newUnit = await createUnit({
+    try {
+      // If no unit selected, create a new one first
+      if (!finalUnitId && newUnitCode) {
+        const newUnit = await createUnit({
+          userId: user.id,
+          name: newUnitName || newUnitCode,
+          code: newUnitCode,
+          credits: 3,
+        });
+        finalUnitId = newUnit.id;
+      }
+
+      if (!finalUnitId) return;
+
+      // Save the timetable entry
+      await createTimetableEntry({
         userId: user.id,
-        name: newUnitName || newUnitCode,
-        code: newUnitCode,
-        credits: 3,
+        unitId: finalUnitId,
+        dayOfWeek,
+        startTime,
+        endTime,
+        room,
+        lecturer: "",
       });
-      finalUnitId = newUnit.id;
+
+      // Reset form and close
+      setUnitId("");
+      setNewUnitCode("");
+      setNewUnitName("");
+      setRoom("");
+      setOpen(false);
+    } catch (err) {
+      // Catch the error thrown by createUnit
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred.");
+      }
     }
-
-    if (!finalUnitId) return;
-
-    // Save the timetable entry
-    await createTimetableEntry({
-      userId: user.id,
-      unitId: finalUnitId,
-      dayOfWeek,
-      startTime,
-      endTime,
-      room,
-      lecturer: "",
-    });
-
-    // Reset form and close
-    setUnitId("");
-    setNewUnitCode("");
-    setNewUnitName("");
-    setRoom("");
-    setOpen(false);
   }
 
   return (
@@ -91,7 +103,6 @@ export function AddClassDialog() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label>Unit</Label>
-            {/* UPDATED: Fixed background and text color */}
             <select
               className="w-full border rounded-md px-3 py-2 text-sm mt-1 bg-background text-foreground"
               value={unitId}
@@ -131,7 +142,6 @@ export function AddClassDialog() {
           <div className="grid grid-cols-3 gap-3">
             <div>
               <Label>Day</Label>
-              {/* UPDATED: Fixed background and text color */}
               <select
                 className="w-full border rounded-md px-3 py-2 text-sm mt-1 bg-background text-foreground"
                 value={dayOfWeek}
@@ -170,6 +180,10 @@ export function AddClassDialog() {
               onChange={(e) => setRoom(e.target.value)}
             />
           </div>
+
+          {error && (
+            <p className="text-sm text-red-600 font-medium">{error}</p>
+          )}
 
           <Button type="submit" className="w-full">Save Class</Button>
         </form>
