@@ -30,7 +30,7 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // UPDATED: Added forgot-password and update-password to public paths
+  // Added forgot-password and update-password to public paths
   const publicPaths = ["/login", "/signup", "/auth", "/forgot-password", "/update-password"];
   const isPublic = publicPaths.some((p) =>
     request.nextUrl.pathname.startsWith(p)
@@ -53,6 +53,14 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|sw.js|manifest.webmanifest|icons|serwist).*)",
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico, sitemap.xml, robots.txt (metadata files)
+     * - sw.js, manifest.webmanifest, icons, serwist (PWA files)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|sw.js|manifest.webmanifest|icons|serwist).*)',
   ],
-};
+}
