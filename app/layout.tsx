@@ -12,6 +12,7 @@ import { Analytics } from "@vercel/analytics/next";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://campus-companion-sigma.vercel.app'), // Added metadataBase
   title: "Campus Companion",
   description: "Timetable, assignments, GPA and notes for university students",
   appleWebApp: {
