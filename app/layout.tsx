@@ -12,7 +12,7 @@ import { Analytics } from "@vercel/analytics/next";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://campus-companion-sigma.vercel.app'), // Added metadataBase
+  metadataBase: new URL('https://campus-companion-sigma.vercel.app'), 
   title: "Campus Companion",
   description: "Timetable, assignments, GPA and notes for university students",
   appleWebApp: {
@@ -50,13 +50,14 @@ export default function RootLayout({
             `,
           }}
         />
+        {/* Added Google Search Console Verification */}
+        <meta name="google-site-verification" content="lehQPhT0d22llKTMlwHxM4TG7sIdHI1zSZqY6IttutU" />
       </head>
       <body className={inter.className}>
         <SerwistProvider>
           <ThemeProvider>
             <div className="min-h-screen bg-background">
               
-              {/* Replaced the old static nav with the new Navbar */}
               <Navbar />
 
               <main className="max-w-5xl mx-auto px-4 py-6">
@@ -68,7 +69,7 @@ export default function RootLayout({
             </div>
           </ThemeProvider>
         </SerwistProvider>
-        <Analytics /> {/* <-- NEW ANALYTICS COMPONENT */}
+        <Analytics />
       </body>
     </html>
   );
